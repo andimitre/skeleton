@@ -1,4 +1,4 @@
-CREATE TABLE receipts (
+CREATE TABLE IF NOT EXISTS receipts (
   id INT UNSIGNED AUTO_INCREMENT,
   uploaded TIME DEFAULT CURRENT_TIME(),
   merchant VARCHAR(255) NOT NULL,
@@ -8,10 +8,7 @@ CREATE TABLE receipts (
   PRIMARY KEY (id)
 );
 
-
-insert into receipts (merchant, amount, receipt_type) values ('best buy', 12, 1);
-
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags (
   id INT UNSIGNED AUTO_INCREMENT,
   receipt_id INT UNSIGNED,
   uploaded TIME DEFAULT CURRENT_TIME(),
@@ -24,6 +21,5 @@ CREATE TABLE tags (
   ON UPDATE CASCADE
 );
 
-insert into tags (receipt_id, tag_category) values (1, 'tech');
 
 

@@ -29,15 +29,13 @@ public class TagController {
         // check if receipt exists
         boolean idExists = tags.receiptExist(receiptID);
         if (idExists) {
-            // meh true, delete
+            // id exists true, delete
             tags.delete(receiptID);
-
         } else {
             // insert
             // tags.insert(receiptID, tagName);
         }
         return "";
-
     }
 
     @GET

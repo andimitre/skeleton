@@ -5,8 +5,6 @@ import generated.tables.Tags;
 import generated.tables.records.ReceiptsRecord;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
@@ -33,7 +31,7 @@ public class TagDao {
 
     public boolean receiptExist(int receiptID) {
         int id = dsl.select().from(RECEIPTS).where(RECEIPTS.ID.eq(receiptID)).fetchOne(RECEIPTS.ID);
-        if (id >= 0) {
+        if (id >= 1) {
             return true;
         } else {
             return false;

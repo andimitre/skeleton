@@ -27,13 +27,13 @@ public class TagController {
     @Path("/tags/{tag}")
     public String toggleTag(@PathParam("tag") String tagName, int receiptID) {
         // check if receipt exists
-        boolean idExists = tags.receiptExist(receiptID);
+        boolean idExists = tags.receiptExist(receiptID, tagName);
         if (idExists) {
             // id exists true, delete
-            tags.delete(receiptID);
+            tags.delete(receiptID, tagName);
         } else {
             // insert
-            // tags.insert(receiptID, tagName);
+            tags.insert(receiptID, tagName);
         }
         return "";
     }

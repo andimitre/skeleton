@@ -24,13 +24,15 @@ public class TagDao {
         return "";
     }
 
-    public void delete(int receipt_id) {
-
-        dsl.deleteFrom(TAGS).where(TAGS.RECEIPT_ID.eq(receipt_id)).execute();
+    public void delete(int receipt_id, String tagName) {
+        dsl.deleteFrom(TAGS).where(TAGS.RECEIPT_ID.eq(receipt_id).and(TAGS.TAG_CATEGORY.eq(tagName))).execute();
     }
 
-    public boolean receiptExist(int receiptID) {
-        int id = dsl.select().from(RECEIPTS).where(RECEIPTS.ID.eq(receiptID)).fetchOne(RECEIPTS.ID);
+    public boolean receiptExist(int receiptID, String tagName) {
+//        int id = dsl.selectCount().from(RECEIPTS).join(TAGS).on(RECEIPTS.ID.eq(TAGS.RECEIPT_ID))
+//                .where(RECEIPTS.ID.eq(receiptID).and(TAGS.TAG_CATEGORY.eq(tagName))).fetchOne(RECEIPTS.ID);
+
+        int id = dsl.selectCount().from(TAGS).where(TAGS.RECEIPT_ID.eq(receiptID).and(TAGS.TAG_CATEGORY.eq(tagName))).fetchOne(0,int.class);
         if (id >= 1) {
             return true;
         } else {

@@ -17,129 +17,128 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="css/local.css">
 
+    <script>
+        $(function() {
+            $.getJSON({
+                url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
+            }).then(function(data) {
+                $.each(data, function(key, val) {
+                    $("<tr class='receipt'>").html("<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
+                        "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
+                        "<input type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></input>" + "</td></tr>").appendTo(".table tbody");
+                });
+            });
+        });
 
-    $(function() {
-    $.getJSON({
-    url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
-    }).then(function(data) {
-    $.each(data, function(key, val) {
-    $("<tr class='receipt'>").html("<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
-    "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
-        "<input type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></input>" + "</td></tr>").appendTo(".table tbody");
-    });
-    });
-    });
-
-    function clean() {
-    $("#addReceipt").trigger('reset');
-    }
-
-    function myfunc() {
-    var merchant = $("#merchant").val();
-    var amount = $("#amount").val();
-    var receipt = {
-    "merchant": merchant,
-    "amount": amount,
-    };
-
-
-    $.ajax({
-    headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-    },
-    type: "POST",
-    url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
-    data: JSON.stringify(receipt),
-    dataType: 'application/json',
-    success: function() {
-    console.log('success');
-    },
-    error: function(XMLHttpRequest, textStatus, errorThrown) {
-    console.log(textStatus);
-    console.log(errorThrown);
-    }
-    });
-    };
-
-
-    function mfun(elt) {
-    var element = $(elt).find(".tags");
-    $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
-    $('.tag_input').keypress(function(e) {
-    if (e.which == 13) {
-    putFunction($('.tag_input'), elt);
-    }
-    });
-    };
-
-    function mremove(child, parent) {
-    if (child == parent) {
-    var pr = parent.parentNode.children[1];
-    pr.remove();
-    child.remove();
-    } else {
-    child.remove();
-    parent.remove();
-    }
-    }
-
-    function mremove2(child, parent, superParent) {
-
-    var id = $(parent).find(".id").text();
-    var tag = $(child).text();
-    var id_int = parseInt(id) + 1;
-    var id_toStr = String(id_int);
-    console.log(id_toStr);
-    child.remove();
-
-    $.ajax({
-    headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-    },
-    url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
-    type: 'PUT',
-    data: id_toStr,
-    dataType: 'application/json',
-    success: function(data) {
-    console.log("success");
-    },
-    error: function(message) {
-    }
-    });
-    }
-
-    function putFunction(elem, parent) {
-    var id = $(parent).find(".id").text();
-    var id_int = parseInt(id) + 1;
-    var id_toStr = String(id_int);
-    var name = elem.val();
-
-    mremove(elem, elem.next('span'));
-    console.log(id_int);
-    $("<span class='badge badge-pill badge-info' onclick='mremove2(this, this.parentNode.parentNode)'>").html(elem.val()).appendTo(parent.childNodes[4]);
- // +  " </input><span onclick='mremove2(this.text, this.parentNode, this.parentNode.parentNode.parentNode )' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
-
-    $.ajax({
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
-        type: 'PUT',
-        data: id_toStr,
-        dataType: 'application/json',
-        success: function(data) {
-            console.log("success");
-        },
-        error: function(message) {
-          console.log(message);
+        function clean() {
+            $("#addReceipt").trigger('reset');
         }
-    });
-}
 
-    </head>
+        function myfunc() {
+            var merchant = $("#merchant").val();
+            var amount = $("#amount").val();
+            var receipt = {
+                "merchant": merchant,
+                "amount": amount,
+            };
+
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
+                data: JSON.stringify(receipt),
+                dataType: 'application/json',
+                success: function() {
+                    console.log('success');
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                }
+            });
+        };
+
+
+        function mfun(elt) {
+            var element = $(elt).find(".tags");
+            $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
+            $('.tag_input').keypress(function(e) {
+                if (e.which == 13) {
+                    putFunction($('.tag_input'), elt);
+                }
+            });
+        };
+
+        function mremove(child, parent) {
+            if (child == parent) {
+                var pr = parent.parentNode.children[1];
+                pr.remove();
+                child.remove();
+            } else {
+                child.remove();
+                parent.remove();
+            }
+        }
+
+        function mremove2(child, parent, superParent) {
+
+            var id = $(parent).find(".id").text();
+            var tag = $(child).text();
+            var id_int = parseInt(id) + 1;
+            var id_toStr = String(id_int);
+            console.log(id_toStr);
+            child.remove();
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
+                type: 'PUT',
+                data: id_toStr,
+                dataType: 'application/json',
+                success: function(data) {
+                    console.log("success");
+                },
+                error: function(message) {}
+            });
+        }
+
+        function putFunction(elem, parent) {
+            var id = $(parent).find(".id").text();
+            var id_int = parseInt(id) + 1;
+            var id_toStr = String(id_int);
+            var name = elem.val();
+
+            mremove(elem, elem.next('span'));
+            console.log(id_int);
+            $("<span class='badge badge-pill badge-info' onclick='mremove2(this, this.parentNode.parentNode)'>").html(elem.val()).appendTo(parent.childNodes[4]);
+            // +  " </input><span onclick='mremove2(this.text, this.parentNode, this.parentNode.parentNode.parentNode )' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
+                type: 'PUT',
+                data: id_toStr,
+                dataType: 'application/json',
+                success: function(data) {
+                    console.log("success");
+                },
+                error: function(message) {
+                    console.log(message);
+                }
+            });
+        }
+    </script>
+</head>
 
 <body>
 <div class="container">
@@ -152,9 +151,9 @@
                 <p>
                     <button class="btn btn-success" type="button" id="add-receipt" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Add Receipt</button>
                 </p>
-                <div class="collapse" id="collapseExample" onsubmit="myfunc">
+                <div class="collapse" id="collapseExample">
                     <div class="card card-body">
-                        <form id="addReceipt">
+                        <form id="addReceipt" onsubmit="myfunc()">
                             <div class="form-group">
                                 <input type="text" class="form-control" id="merchant" aria-describedby="emailHelp" placeholder="merchant name" required>
                                 <br>
@@ -185,11 +184,11 @@
                     </thead>
                     <tbody>
                     <!-- <tr>
-            <th scope="row"></th>
-            <td class="time"></td>
-            <td class="merchant"></td>
-            <td class="amount"></td>
-            <td class="tags"></td> -->
+    <th scope="row"></th>
+    <td class="time"></td>
+    <td class="merchant"></td>
+    <td class="amount"></td>
+    <td class="tags"></td> -->
                     <!-- </tr> -->
                     </tbody>
                 </table>
@@ -197,6 +196,7 @@
         </div>
     </div>
 </div>
+<script src="js/index.js"></script>
 </body>
 
 </html>

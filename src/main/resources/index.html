@@ -15,72 +15,76 @@
 
     <!-- bootstrap and other css -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/local.css">
-    <script type="text/javascript">
+    <link rel="stylesheet" href="css/local.css">
 
 
-$(function() {
+    $(function() {
     $.getJSON({
-        url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
+    url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
     }).then(function(data) {
-        $.each(data, function(key, val) {
-            $("<div class='receipt'>").html("<tr>" + "<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
-                "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
-                "<button type='button' class='btn btn-success add-tag'onclick='mfun(this.parentNode.parentNode)'>Add Tag <span class='badge badge-danger'>+</span></button>" + "</td></tr>").appendTo(".table tbody");
-        });
+    $.each(data, function(key, val) {
+    $("<tr class='receipt'>").html("<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
+    "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
+        "<input type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></input>" + "</td></tr>").appendTo(".table tbody");
     });
-});
+    });
+    });
 
-function myfunc() {
-    var $merchant = $("#merchant").val();
-    var $amount = $("#amount").val();
+    function clean() {
+    $("#addReceipt").trigger('reset');
+    }
+
+    function myfunc() {
+    var merchant = $("#merchant").val();
+    var amount = $("#amount").val();
     var receipt = {
-        "merchant": $merchant,
-        "amount": $amount,
+    "merchant": merchant,
+    "amount": amount,
     };
+
+
     $.ajax({
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-
-        },
-        type: "POST",
-        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
-        data: JSON.stringify(receipt),
-        dataType: 'application/json',
-        success: function() {
-            console.log('success');
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            console.log(textStatus);
-            console.log(errorThrown);
-        }
+    headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+    },
+    type: "POST",
+    url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
+    data: JSON.stringify(receipt),
+    dataType: 'application/json',
+    success: function() {
+    console.log('success');
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+    console.log(textStatus);
+    console.log(errorThrown);
+    }
     });
-};
+    };
 
 
-function mfun(elt) {
+    function mfun(elt) {
     var element = $(elt).find(".tags");
     $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
     $('.tag_input').keypress(function(e) {
-        if (e.which == 13) {
-            putFunction($('.tag_input'), elt);
-        }
-    });
-};
-
-function mremove(child, parent) {
-    if (child == parent) {
-        var pr = parent.parentNode.children[1];
-        pr.remove();
-        child.remove();
-    } else {
-        child.remove();
-        parent.remove();
+    if (e.which == 13) {
+    putFunction($('.tag_input'), elt);
     }
-}
+    });
+    };
 
-function mremove2(child, parent, superParent) {
+    function mremove(child, parent) {
+    if (child == parent) {
+    var pr = parent.parentNode.children[1];
+    pr.remove();
+    child.remove();
+    } else {
+    child.remove();
+    parent.remove();
+    }
+    }
+
+    function mremove2(child, parent, superParent) {
 
     var id = $(parent).find(".id").text();
     var tag = $(child).text();
@@ -90,23 +94,23 @@ function mremove2(child, parent, superParent) {
     child.remove();
 
     $.ajax({
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
-        type: 'PUT',
-        data: id_toStr,
-        dataType: 'application/json',
-        success: function(data) {
-            console.log("success");
-        },
-        error: function(message) {
-        }
+    headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+    },
+    url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
+    type: 'PUT',
+    data: id_toStr,
+    dataType: 'application/json',
+    success: function(data) {
+    console.log("success");
+    },
+    error: function(message) {
+    }
     });
-}
+    }
 
-function putFunction(elem, parent) {
+    function putFunction(elem, parent) {
     var id = $(parent).find(".id").text();
     var id_int = parseInt(id) + 1;
     var id_toStr = String(id_int);
@@ -135,8 +139,7 @@ function putFunction(elem, parent) {
     });
 }
 
-    </script>
-</head>
+    </head>
 
 <body>
 <div class="container">
@@ -149,7 +152,7 @@ function putFunction(elem, parent) {
                 <p>
                     <button class="btn btn-success" type="button" id="add-receipt" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Add Receipt</button>
                 </p>
-                <div class="collapse" id="collapseExample">
+                <div class="collapse" id="collapseExample" onsubmit="myfunc">
                     <div class="card card-body">
                         <form id="addReceipt">
                             <div class="form-group">
@@ -159,8 +162,8 @@ function putFunction(elem, parent) {
                             </div>
                             <div class="form-check">
                             </div>
-                            <button type="button" class="btn btn-primary" onclick="myfunc()" id="save-receipt">Save</button>
-                            <button type="button" data-toggle="collapse" id="save-receipt" data-target="#collapseExample" class="btn btn-danger">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="save-receipt">Save</button>
+                            <button type="button" data-toggle="collapse" onclick="clean()" id="cancel-receipt" data-target="#collapseExample" class="btn btn-danger">Cancel</button>
                         </form>
                     </div>
                 </div>
@@ -194,7 +197,6 @@ function putFunction(elem, parent) {
         </div>
     </div>
 </div>
-<script src="index.js"></script>
 </body>
 
 </html>

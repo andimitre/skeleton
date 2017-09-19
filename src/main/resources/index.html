@@ -17,96 +17,123 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/local.css">
     <script type="text/javascript">
-                $(function() {
-            $.getJSON({
-                url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
-            }).then(function(data) {
-                $.each(data, function(key, val) {
-                    $("<div class='receipt'>").html("<tr>" + "<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
-                        "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
-                        "<button type='button' class='btn btn-success add-tag'onclick='mfun(this.parentNode.parentNode)'>Add Tag <span class='badge badge-danger'>+</span></button>" + "</td></tr>").appendTo(".table tbody");
-                });
-            });
+
+
+$(function() {
+    $.getJSON({
+        url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
+    }).then(function(data) {
+        $.each(data, function(key, val) {
+            $("<div class='receipt'>").html("<tr>" + "<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
+                "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
+                "<button type='button' class='btn btn-success add-tag'onclick='mfun(this.parentNode.parentNode)'>Add Tag <span class='badge badge-danger'>+</span></button>" + "</td></tr>").appendTo(".table tbody");
         });
+    });
+});
 
-        function myfunc() {
-            var $merchant = $("#merchant").val();
-            var $amount = $("#amount").val();
-            var receipt = {
-                "merchant": $merchant,
-                "amount": $amount,
-            };
-            $.ajax({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+function myfunc() {
+    var $merchant = $("#merchant").val();
+    var $amount = $("#amount").val();
+    var receipt = {
+        "merchant": $merchant,
+        "amount": $amount,
+    };
+    $.ajax({
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
 
-                },
-                type: "POST",
-                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
-                data: JSON.stringify(receipt),
-                dataType: 'application/json',
-                success: function() {
-                    console.log('success');
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(textStatus);
-                    console.log(errorThrown);
-                }
-            });
-        };
-
-
-        function mfun(elt) {
-            var element = $(elt).find(".tags");
-            $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
-            $('.tag_input').keypress(function(e) {
-                if (e.which == 13) {
-                    putFunction($('.tag_input'), elt);
-                }
-            });
-        };
-
-        function mremove(child, parent) {
-            if (child == parent) {
-                var pr = parent.parentNode.children[1];
-                pr.remove();
-                child.remove();
-            } else {
-                child.remove();
-                parent.remove();
-            }
+        },
+        type: "POST",
+        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
+        data: JSON.stringify(receipt),
+        dataType: 'application/json',
+        success: function() {
+            console.log('success');
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
         }
+    });
+};
 
-        function mremove2(child, parent) {
-            parent.remove();
+
+function mfun(elt) {
+    var element = $(elt).find(".tags");
+    $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
+    $('.tag_input').keypress(function(e) {
+        if (e.which == 13) {
+            putFunction($('.tag_input'), elt);
         }
+    });
+};
 
-        function putFunction(elem, parent) {
-            var id = $(parent).find(".id").text();
-            var name = elem.val();
+function mremove(child, parent) {
+    if (child == parent) {
+        var pr = parent.parentNode.children[1];
+        pr.remove();
+        child.remove();
+    } else {
+        child.remove();
+        parent.remove();
+    }
+}
 
-            mremove(elem, elem.next('span'));
-            $("<span class='badge badge-pill badge-info'></span>").html('' + elem.val() + "  " +  " </input><span onclick='mremove2(this, this.parentNode)' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
+function mremove2(child, parent, superParent) {
 
-            $.ajax({
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json'
-                },
-                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
-                type: 'PUT',
-                data: id,
-                dataType: 'application/json',
-                success: function(data) {
-                    alert('Load was performed.');
-                },
-                error: function(message) {
-                    console.log("there was an error");
-                    console.log(message);
-                }
-            });
+    var id = $(parent).find(".id").text();
+    var tag = $(child).text();
+    var id_int = parseInt(id) + 1;
+    var id_toStr = String(id_int);
+    console.log(id_toStr);
+    child.remove();
+
+    $.ajax({
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
+        type: 'PUT',
+        data: id_toStr,
+        dataType: 'application/json',
+        success: function(data) {
+            console.log("success");
+        },
+        error: function(message) {
         }
+    });
+}
+
+function putFunction(elem, parent) {
+    var id = $(parent).find(".id").text();
+    var id_int = parseInt(id) + 1;
+    var id_toStr = String(id_int);
+    var name = elem.val();
+
+    mremove(elem, elem.next('span'));
+    console.log(id_int);
+    $("<span class='badge badge-pill badge-info' onclick='mremove2(this, this.parentNode.parentNode)'>").html(elem.val()).appendTo(parent.childNodes[4]);
+ // +  " </input><span onclick='mremove2(this.text, this.parentNode, this.parentNode.parentNode.parentNode )' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
+
+    $.ajax({
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
+        type: 'PUT',
+        data: id_toStr,
+        dataType: 'application/json',
+        success: function(data) {
+            console.log("success");
+        },
+        error: function(message) {
+          console.log(message);
+        }
+    });
+}
 
     </script>
 </head>

@@ -1,5 +1,5 @@
-import controllers.HelloWorldController;
 import controllers.NetController;
+import controllers.StaticHtmlController;
 import controllers.ReceiptController;
 import controllers.TagController;
 import dao.ReceiptDao;
@@ -42,9 +42,9 @@ public class SimpleApplication extends Application<Configuration> {
         ReceiptDao receiptDao = new ReceiptDao(jooqConfig);
         TagDao tagDao = new TagDao(jooqConfig);
 
-        // Register all Controllers below.  Don't forget 
+        // Register all Controllers below.  Don't forget
         // you need class and method @Path annotations!
-        env.jersey().register(new HelloWorldController());
+        env.jersey().register(new StaticHtmlController());
         env.jersey().register(new ReceiptController(receiptDao));
         env.jersey().register(new TagController(tagDao));
         env.jersey().register(new NetController());

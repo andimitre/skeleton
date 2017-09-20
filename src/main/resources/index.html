@@ -15,128 +15,139 @@
 
     <!-- bootstrap and other css -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/local.css">
 
     <script>
-        $(function() {
-            $.getJSON({
-                url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
-            }).then(function(data) {
-                $.each(data, function(key, val) {
-                    $("<tr class='receipt'>").html("<td class='id'>" + key + "<td>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
-                        "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
-                        "<input type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></input>" + "</td></tr>").appendTo(".table tbody");
-                });
-            });
-        });
+     $(function() {
+        $.getJSON({
+         url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
+     }).then(function(data) {
+         $.each(data, function(key, val) {
+             $("<tr class='receipt'>").html("<td class='id'>" + key + "</td>" + "<td class='created'>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
+                 "<td class='amount'>" + val.value + "</td>" + "<td class='tags'>" +
+                 "<button type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></button>" + "</td></tr>").appendTo(".table tbody");
+         });
+     });
+ });
 
-        function clean() {
-            $("#addReceipt").trigger('reset');
-        }
+ function clean() {
+     $("#merchant").trigger('reset');
+     $("#amount").trigger('reset');
+ }
 
-        function myfunc() {
-            var merchant = $("#merchant").val();
-            var amount = $("#amount").val();
-            var receipt = {
-                "merchant": merchant,
-                "amount": amount,
-            };
+ function myfunc() {
+     var merchant = $("#merchant").val();
+     var amount = $("#amount").val();
+     var receipt = {
+         "merchant": merchant,
+         "amount": amount,
+     };
+     console.log(merchant);
+     console.log(amount);
+     console.log(receipt);
 
+     $.ajax({
+         headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+         },
+         type: "POST",
+         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
+         data: JSON.stringify(receipt),
+         dataType: 'json',
+         success: function(n) {
+             var id = n;
+             $.getJSON("/receipts", function(data) {
+                 var someval = data[data.length - 1];
+                 console.log(someval);
+                 $("<tr class='receipt'>").html("<td class='id'>" + id + "</td>" + "<td class='created'>" + someval.created + "</td>" + "<td class='merchant'>" + someval.merchantName + "</td>" +
+                     "<td class='amount'>" + someval.value + "</td>" + "<td class='ta'>" +
+                     "<button type='button' class='btn btn-success add-tag' value='Add Tag +' onclick='mfun(this.parentNode.parentNode)'></button>" + "</td></tr>").appendTo(".table tbody");
+             });
+         },
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+             console.log(textStatus);
+             console.log(errorThrown);
+         }
+     });
+ };
 
-            $.ajax({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                type: "POST",
-                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
-                data: JSON.stringify(receipt),
-                dataType: 'application/json',
-                success: function() {
-                    console.log('success');
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(textStatus);
-                    console.log(errorThrown);
-                }
-            });
-        };
+ function mfun(elt) {
+     // var element = $(elt).find(".tags");
+     console.log("elt");
+     console.log(elt);
+     // console.log(element);
+     $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(elt);
+     $('.tag_input').keypress(function(e) {
+         if (e.which == 13) {
+             putFunction($('.tag_input'), elt);
+         }
+     });
+ };
 
+ function mremove(child, parent) {
+     if (child == parent) {
+         var pr = parent.parentNode.children[1];
+         pr.remove();
+         child.remove();
+     } else {
+         child.remove();
+         parent.remove();
+     }
+ }
 
-        function mfun(elt) {
-            var element = $(elt).find(".tags");
-            $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(element);
-            $('.tag_input').keypress(function(e) {
-                if (e.which == 13) {
-                    putFunction($('.tag_input'), elt);
-                }
-            });
-        };
+ function mremove2(child, parent, superParent) {
 
-        function mremove(child, parent) {
-            if (child == parent) {
-                var pr = parent.parentNode.children[1];
-                pr.remove();
-                child.remove();
-            } else {
-                child.remove();
-                parent.remove();
-            }
-        }
+     var id = $(parent).find(".id").text();
+     var tag = $(child).text();
+     var id_int = parseInt(id) + 1;
+     var id_toStr = String(id_int);
+     console.log(id_toStr);
+     child.remove();
 
-        function mremove2(child, parent, superParent) {
+     $.ajax({
+         headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+         },
+         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
+         type: 'PUT',
+         data: id_toStr,
+         dataType: 'json',
+         success: function(data) {
+             console.log("success");
+         },
+         error: function(message) {}
+     });
+ }
 
-            var id = $(parent).find(".id").text();
-            var tag = $(child).text();
-            var id_int = parseInt(id) + 1;
-            var id_toStr = String(id_int);
-            console.log(id_toStr);
-            child.remove();
+ function putFunction(elem, parent) {
+     var id = $(parent).find(".id").text();
+     var id_int = parseInt(id) + 1;
+     var id_toStr = String(id_int);
+     var name = elem.val();
 
-            $.ajax({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
-                type: 'PUT',
-                data: id_toStr,
-                dataType: 'application/json',
-                success: function(data) {
-                    console.log("success");
-                },
-                error: function(message) {}
-            });
-        }
+     mremove(elem, elem.next('span'));
+     console.log(id_int);
+     $("<span class='badge badge-pill badge-info tagValue' onclick='mremove2(this, this.parentNode.parentNode)'>").html(elem.val()).appendTo(parent.childNodes[4]);
+     // +  " </input><span onclick='mremove2(this.text, this.parentNode, this.parentNode.parentNode.parentNode )' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
 
-        function putFunction(elem, parent) {
-            var id = $(parent).find(".id").text();
-            var id_int = parseInt(id) + 1;
-            var id_toStr = String(id_int);
-            var name = elem.val();
-
-            mremove(elem, elem.next('span'));
-            console.log(id_int);
-            $("<span class='badge badge-pill badge-info' onclick='mremove2(this, this.parentNode.parentNode)'>").html(elem.val()).appendTo(parent.childNodes[4]);
-            // +  " </input><span onclick='mremove2(this.text, this.parentNode, this.parentNode.parentNode.parentNode )' class='badge badge-danger'>X</span>").appendTo(parent.childNodes[4]);
-
-            $.ajax({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
-                type: 'PUT',
-                data: id_toStr,
-                dataType: 'application/json',
-                success: function(data) {
-                    console.log("success");
-                },
-                error: function(message) {
-                    console.log(message);
-                }
-            });
-        }
+     $.ajax({
+         headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+         },
+         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
+         type: 'PUT',
+         data: id_toStr,
+         dataType: 'json',
+         success: function(data) {
+             console.log("success");
+         },
+         error: function(message) {
+             console.log(message);
+         }
+     });
+ }
     </script>
 </head>
 
@@ -153,17 +164,16 @@
                 </p>
                 <div class="collapse" id="collapseExample">
                     <div class="card card-body">
-                        <form id="addReceipt" onsubmit="myfunc()">
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="merchant" aria-describedby="emailHelp" placeholder="merchant name" required>
-                                <br>
-                                <input type="number" class="form-control" id="amount" placeholder="amount">
-                            </div>
-                            <div class="form-check">
-                            </div>
-                            <button type="submit" class="btn btn-primary" id="save-receipt">Save</button>
-                            <button type="button" data-toggle="collapse" onclick="clean()" id="cancel-receipt" data-target="#collapseExample" class="btn btn-danger">Cancel</button>
-                        </form>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="merchant" aria-describedby="emailHelp" placeholder="merchant name" required>
+                            <br>
+                            <input type="number" step="0.01" class="form-control" id="amount" placeholder="amount">
+                        </div>
+                        <div class="form-check">
+                        </div>
+                        <button type="button" onclick="myfunc()" class="btn btn-primary" id="save-receipt">Save</button>
+                        <button type="button" data-toggle="collapse" onclick="clean()" id="cancel-receipt" data-target="#collapseExample" class="btn btn-danger">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -196,7 +206,6 @@
         </div>
     </div>
 </div>
-<script src="js/index.js"></script>
 </body>
 
 </html>

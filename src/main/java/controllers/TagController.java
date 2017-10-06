@@ -1,11 +1,8 @@
 package controllers;
 
-import api.CreateReceiptRequest;
 import api.ReceiptResponse;
 import dao.TagDao;
 import generated.tables.records.ReceiptsRecord;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -49,6 +46,7 @@ public class TagController {
     @Path("/tags/{tag}")
     public List<ReceiptResponse> getReceiptsByTagCategory(@PathParam("tag") String tagName) {
         List<ReceiptsRecord> receiptRecords = tags.getReceiptsByTagCat(tagName);
+        System.out.println(receiptRecords);
         return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
     }
 }

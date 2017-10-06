@@ -17,9 +17,16 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 
     <script>
+
+    var api_url = "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts";
+    var local_receipts = "http://localhost:8080/receipts";
+    var local_tags = "http://localhost:8080/tags/";
+    var tag_url = "http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/";
+
+
      $(function() {
         $.getJSON({
-         url: "http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts"
+         url: "http://localhost:8080/receipts"
      }).then(function(data) {
          $.each(data, function(key, val) {
              $("<tr class='receipt'>").html("<td class='id'>" + key + "</td>" + "<td class='created'>" + val.created + "</td>" + "<td class='merchant'>" + val.merchantName + "</td>" +
@@ -41,9 +48,6 @@
          "merchant": merchant,
          "amount": amount,
      };
-     console.log(merchant);
-     console.log(amount);
-     console.log(receipt);
 
      $.ajax({
          headers: {
@@ -51,7 +55,7 @@
              'Content-Type': 'application/json'
          },
          type: "POST",
-         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/receipts',
+         url:  "http://localhost:8080/receipts",
          data: JSON.stringify(receipt),
          dataType: 'json',
          success: function(n) {
@@ -72,10 +76,6 @@
  };
 
  function mfun(elt) {
-     // var element = $(elt).find(".tags");
-     console.log("elt");
-     console.log(elt);
-     // console.log(element);
      $("<input type='text' class='tag_input'></input><span onclick='mremove(this, this)' class='badge badge-danger'>X</span>'").appendTo(elt);
      $('.tag_input').keypress(function(e) {
          if (e.which == 13) {
@@ -109,7 +109,7 @@
              'Accept': 'application/json',
              'Content-Type': 'application/json'
          },
-         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + tag,
+         url: "http://localhost:8080/tags/" + tag,
          type: 'PUT',
          data: id_toStr,
          dataType: 'json',
@@ -136,7 +136,7 @@
              'Accept': 'application/json',
              'Content-Type': 'application/json'
          },
-         url: 'http://ec2-54-234-72-129.compute-1.amazonaws.com/tags/' + name,
+         url: local_tags + name,
          type: 'PUT',
          data: id_toStr,
          dataType: 'json',

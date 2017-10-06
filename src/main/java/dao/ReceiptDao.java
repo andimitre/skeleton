@@ -1,6 +1,5 @@
 package dao;
 
-import api.ReceiptResponse;
 import generated.tables.records.ReceiptsRecord;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -11,6 +10,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
 import static generated.Tables.RECEIPTS;
+import static generated.Tables.TAGS;
 
 public class ReceiptDao {
     DSLContext dsl;
@@ -33,5 +33,9 @@ public class ReceiptDao {
 
     public List<ReceiptsRecord> getAllReceipts() {
         return dsl.selectFrom(RECEIPTS).fetch();
+    }
+
+    public List<ReceiptsRecord> getAllReceiptsAndTags() {
+        return dsl.select().from(RECEIPTS).join(TAGS).on(RECEIPTS.ID.eq(TAGS.RECEIPT_ID)).fetchInto(RECEIPTS);
     }
 }

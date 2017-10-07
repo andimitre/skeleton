@@ -1,6 +1,7 @@
 import controllers.NetController;
-import controllers.StaticHtmlController;
 import controllers.ReceiptController;
+import controllers.StaticHtmlController;
+import controllers.ReceiptImageController;
 import controllers.TagController;
 import dao.ReceiptDao;
 import dao.TagDao;
@@ -46,6 +47,7 @@ public class SimpleApplication extends Application<Configuration> {
         // you need class and method @Path annotations!
         env.jersey().register(new StaticHtmlController());
         env.jersey().register(new ReceiptController(receiptDao));
+        env.jersey().register(new ReceiptImageController());
         env.jersey().register(new TagController(tagDao));
         env.jersey().register(new NetController());
     }

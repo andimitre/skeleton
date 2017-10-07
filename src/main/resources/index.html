@@ -192,7 +192,8 @@
              data: base64EncodedImageData,
              contentType: "text/plain",
              success: function(data) {
-                console.log(data);
+                merchant.value = data.merchantName;
+                amount.value = data.value;
              },
         })
          .then(response => {

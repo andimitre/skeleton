@@ -97,8 +97,8 @@ public class ReceiptImageController {
 //            System.out.println(wtg.length);
 //            System.out.println(wtg_1);
             String lastOne = wtg[wtg.length-5];
-//            System.out.println(lastOne);
-//            System.out.println(lastOne.length());
+            System.out.println(lastOne);
+            System.out.println(lastOne.length());
 
             merchantName = getTrueValue(wtg_1);
             amount = getTrueAmount(lastOne);
